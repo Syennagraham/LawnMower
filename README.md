@@ -16,3 +16,5 @@ Instructions to create a remote-controlled lawn mower.
 5. Upload **PS2X_Example.pde** code to the sketch book and upload this code to the Arduino.
 6. Monitor the serial monitor for output. 
 
+#### Sources
+https://surtrtech.com/2018/11/29/interfacing-wireless-ps2-controller-with-arduino/
