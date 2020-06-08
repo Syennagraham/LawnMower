@@ -19,14 +19,11 @@ void setup()
   if(error == 0)
   {
     Serial.println("Found Controller, configured successful");
-    Serial.println("holding L1 or R1 will print out the analog stick values.");
   }
   else if(error == 1)
     Serial.println("No controller found, check wiring, see readme.txt to enable debug.");
   else if(error == 2)
     Serial.println("Controller found but not accepting commands. see readme.txt to enable debug.");
-  else if(error == 3)
-    Serial.println("Controller refusing to enter Pressures mode, may not support it. ");
 }
 
 void loop()
@@ -39,24 +36,38 @@ void loop()
     // read controller and set large motor to spin at 'vibrate' speed
     ps2x.read_gamepad(false, vibrate);
     
-    
-    // this will set the large motor vibrate speed based on how hard you press the blue (X) button
-    vibrate = ps2x.Analog(PSAB_BLUE);
-    
     // print stick values if either is TRUE
     if(ps2x.Button(PSB_L1) || ps2x.Button(PSB_R1))
     {
+      // Right stick, Y axis. Other options: LX, RY, RX  
       Serial.print("JoyStick Value:");
       Serial.println(ps2x.Analog(PSS_RY), DEC);
-      
-      // Right stick, Y axis. Other options: LX, RY, RX  
-      // Currently up is stop and down is faster, right in the middle is slow
-      // Need to switch joystick directions
-      
-      int PS2direction = ps2x.Analog(PSS_RY); 
-      analogWrite(saberToothPin, PS2direction);
+
+      if(ps2x.Analog(PSS_RY) >= 127 && ps2x.Analog(PSS_RY) <= 255) //real center value is 128, but 140 is needed because controller is HIGHLY sensitive
+      {
+        int initialSpeed = 128;
+        initialSpeed = map(ps2x.Analog(PSS_RY),127 , 255, 0 , 255);
+        /*
+        Syntax  
+                  map(value, fromLow, fromHigh, toLow, toHigh)
+        Parameters
+                  value: the number to map.
+                  fromLow: the lower bound of the value’s current range.
+                  fromHigh: the upper bound of the value’s current range.
+                  toLow: the lower bound of the value’s target range.
+                  toHigh: the upper bound of the value’s target range.
+        */
+        analogWrite(saberToothPin, initialSpeed);
+      }
+      else
+      { 
+        // Map 0 to 255 as well, so you can move the joystick up to move the mower instead of down.
+        int motorSpeed = map(ps2x.Analog(PSS_RY),0 , 255, 255 , 0);
+        //analogWrite(saberToothPin, ps2x.Analog(PSS_RY));  
+        analogWrite(saberToothPin, motorSpeed);  
+      }
       
     }
-  //}
+    
   delay(50);
 }
