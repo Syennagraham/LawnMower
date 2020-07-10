@@ -7,7 +7,7 @@
 #include <SoftwareSerial.h>
 #include <USBSabertooth.h>
 
-SoftwareSerial      SWSerial(NOT_A_PIN, 11); // RX on no pin (unused), TX on pin 11 (to S1).
+SoftwareSerial      SWSerial(NOT_A_PIN, 6); // RX on no pin (unused), TX on pin 6 (to S1).
 USBSabertoothSerial C(SWSerial);             // Use SWSerial as the serial port.
 USBSabertooth       ST(C, 128);              // Use address 128.
 
