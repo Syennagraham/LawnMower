@@ -21,7 +21,7 @@ PS2X ps2x;                                   // create PS2 Controller Class
 int error = 0; 
 byte type = 0;
 byte vibrate = 0;
-int saberToothPin = 6;  // Hook S1 of the Sabertooth to 3  
+int saberToothPin = 6;  // Hook S1 of the Sabertooth to 6 
 // Hook the PS2 controller to arduino following diagram on github page https://github.com/Syennagraham/LawnMower
 
 void setup()
