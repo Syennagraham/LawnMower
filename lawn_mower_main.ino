@@ -1,18 +1,33 @@
+/*
+ * DIP SWITCHES
+ * OFF : 1 and 2
+ * ON  : 3, 4, 5 and 6
+ * 
+ * Ramp motor 1 from -2047 to 2047 (full reverse to full forward)
+ * 
+ * waiting 20 means delay(20)
+ * ST.motor(NUMBER CORRESPONDING TO MOTOR, POWER LEVEL)
+ */
+
+#include <SoftwareSerial.h>
+#include <USBSabertooth.h>
 #include <PS2X_lib.h>
 
-PS2X ps2x; // create PS2 Controller Class
+SoftwareSerial      SWSerial(NOT_A_PIN, 6);  // RX on no pin (unused), TX on pin 6 (to S1).
+USBSabertoothSerial C(SWSerial);             // Use SWSerial as the serial port.
+USBSabertooth       ST(C, 128);              // Use address 128.
+PS2X ps2x;                                   // create PS2 Controller Class
 
 int error = 0; 
 byte type = 0;
 byte vibrate = 0;
-int saberToothPin = 3;  // Hook S1 of the Sabertooth to 3  
+int saberToothPin = 6;  // Hook S1 of the Sabertooth to 3  
 // Hook the PS2 controller to arduino following diagram on github page https://github.com/Syennagraham/LawnMower
 
 void setup()
 {
+  SWSerial.begin(9600);
   Serial.begin(9600);
-  
-  pinMode(saberToothPin, OUTPUT);
   
   error = ps2x.config_gamepad(13,11,10,12, true, true); // setup pins and settings:  GamePad(clock, command, attention, data, Pressures?, Rumble?) check for error
   
@@ -28,6 +43,8 @@ void setup()
 
 void loop()
 {
+    int power;
+    
     // skip loop if no controller found
     if(error == 1)
       return; 
@@ -40,33 +57,41 @@ void loop()
     if(ps2x.Button(PSB_L1) || ps2x.Button(PSB_R1))
     {
       // Right stick, Y axis. Other options: LX, RY, RX  
-      Serial.print("JoyStick Value:");
+      Serial.print("PS2 Value:");
       Serial.println(ps2x.Analog(PSS_RY), DEC);
 
-      if(ps2x.Analog(PSS_RY) >= 127 && ps2x.Analog(PSS_RY) <= 255) //real center value is 128, but 140 is needed because controller is HIGHLY sensitive
+      if(ps2x.Analog(PSS_RY) >= 0 && ps2x.Analog(PSS_RY) <= 126) //real center value is 128, but 140 is needed because controller is HIGHLY sensitive
       {
-        int initialSpeed = 128;
-        initialSpeed = map(ps2x.Analog(PSS_RY),127 , 255, 0 , 255);
-        /*
-        Syntax  
-                  map(value, fromLow, fromHigh, toLow, toHigh)
-        Parameters
-                  value: the number to map.
-                  fromLow: the lower bound of the value’s current range.
-                  fromHigh: the upper bound of the value’s current range.
-                  toLow: the lower bound of the value’s target range.
-                  toHigh: the upper bound of the value’s target range.
-        */
-        analogWrite(saberToothPin, initialSpeed);
+
+        // Map the incoming analog value from the joystick to the serial command given to the sabertooth
+        // Positve 200 here is used to be the fastest speed forwards
+        power = map(ps2x.Analog(PSS_RY),127, 0, 0 , 200);
+        Serial.print("FORWARD : ");
+        Serial.println(power);
+  
+        ,
+        // 
+  
+        ST.motor(1, power);
+        ST.motor(2, power);
+  
       }
-      else
+      else if (ps2x.Analog(PSS_RY) >= 128 && ps2x.Analog(PSS_RY) <= 255)
       { 
-        // Map 0 to 255 as well, so you can move the joystick up to move the mower instead of down.
-        int motorSpeed = map(ps2x.Analog(PSS_RY),0 , 255, 255 , 0);
-        //analogWrite(saberToothPin, ps2x.Analog(PSS_RY));  
-        analogWrite(saberToothPin, motorSpeed);  
+        // Map the incoming analog value from the joystick to the serial command given to the sabertooth
+        // Negative 200 here is used to be the fastest speed backwards
+        power = map(ps2x.Analog(PSS_RY),128, 255, 0, -200);
+        Serial.print("BACKWARD :");
+        Serial.println(power);
+        
+        ST.motor(1, power);
+        ST.motor(2, power);
       }
-      
+      else 
+      {
+        ST.motor(1, 0);
+        ST.motor(2, 0);
+      }
     }
     
   delay(50);
