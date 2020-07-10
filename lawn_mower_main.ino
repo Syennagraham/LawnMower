@@ -21,7 +21,8 @@ PS2X ps2x;                                   // create PS2 Controller Class
 int error = 0; 
 byte type = 0;
 byte vibrate = 0;
-int saberToothPin = 6;  // Hook S1 of the Sabertooth to 3  
+int power;
+int saberToothPin = 6;  // Hook S1 of the Sabertooth to 6
 // Hook the PS2 controller to arduino following diagram on github page https://github.com/Syennagraham/LawnMower
 
 void setup()
@@ -43,8 +44,7 @@ void setup()
 
 void loop()
 {
-    int power;
-    
+   
     // skip loop if no controller found
     if(error == 1)
       return; 
@@ -58,72 +58,93 @@ void loop()
     if(ps2x.Button(PSB_L1) || ps2x.Button(PSB_R1))
     {
       // Right stick, Y axis. Other options: LX, LY, RX  
-      Serial.print("PS2 RIGHT Y AXIS VALUE: ");
+      Serial.print("PS2 RIGHT Y AXIS : ");
       Serial.print(ps2x.Analog(PSS_RY), DEC);
       Serial.print("\t");
       
-      // Left stick, Y axis. Other options: LX, RY, RX 
-      Serial.print("PS2 LEFT Y AXIS VALUE: ");
+      // Left stick, Y axis.
+      Serial.print("PS2 LEFT Y AXIS: ");
       Serial.println(ps2x.Analog(PSS_LY), DEC);
 
-      // IF THE RIGHT JOYSTICK BEING PUSHED UP, MOVE M2 FORWARD 
+       
       if(ps2x.Analog(PSS_RY) >= 0 && ps2x.Analog(PSS_RY) <= 126) //real center value is 128, but 140 is needed because controller is HIGHLY sensitive
       {
+        rightStickNorth();
+      }
+      else if (ps2x.Analog(PSS_RY) >= 128 && ps2x.Analog(PSS_RY) <= 255)
+      { 
+        rightStickSouth();
+      }
+      else
+      {
+        killRightMotor();
+      }        
+      
+      if(ps2x.Analog(PSS_LY) >= 0 && ps2x.Analog(PSS_LY) <= 126) //real center value is 128, but 140 is needed because controller is HIGHLY sensitive
+      {
+        leftStickNorth();
+      }
+      else if (ps2x.Analog(PSS_LY) >= 128 && ps2x.Analog(PSS_LY) <= 255)
+      { 
+        leftStickSouth();
+      }
+      else
+      {
+        killLeftMotor();
+      }
+      
+    }
+  delay(50);
+}
 
+// IF THE RIGHT JOYSTICK BEING PUSHED UP, MOVE M2 FORWARD
+void rightStickNorth(){
         // Map the incoming analog value from the joystick to the serial command given to the sabertooth
         // Positve 200 here is used to be the fastest speed forwards
         power = map(ps2x.Analog(PSS_RY),127, 0, 0 , 200);
-        Serial.print("FORWARD : ");
+        Serial.print("M2 FORWARD : ");
         Serial.println(power);
-  
         ST.motor(2, power);
-  
-      }
-      //  IF THE RIGHT JOYSTICK BEING PUSHED DOWN, MOVE M2 BACKWARDS
-      else if (ps2x.Analog(PSS_RY) >= 128 && ps2x.Analog(PSS_RY) <= 255)
-      { 
+}
+
+//  IF THE RIGHT JOYSTICK BEING PUSHED DOWN, MOVE M2 BACKWARDS
+void rightStickSouth(){
         // Map the incoming analog value from the joystick to the serial command given to the sabertooth
         // Negative 200 here is used to be the fastest speed backwards
         power = map(ps2x.Analog(PSS_RY),128, 255, 0, -200);
-        Serial.print("BACKWARD :");
+        Serial.print("M2 BACKWARD :");
         Serial.println(power);
         
-        ST.motor(2, power);
-      }
-      else 
-      {
-        ST.motor(2, 0);
-      }
+        ST.motor(2, power);  
+}
 
-      // IF THE LEFT JOYSTICK BEING PUSHED UP, MOVE M1 FORWARD 
-      if(ps2x.Analog(PSS_LY) >= 0 && ps2x.Analog(PSS_LY) <= 126) //real center value is 128, but 140 is needed because controller is HIGHLY sensitive
-      {
-
+// IF THE LEFT JOYSTICK BEING PUSHED UP, MOVE M1 FORWARD 
+void leftStickNorth(){
         // Map the incoming analog value from the joystick to the serial command given to the sabertooth
         // Positve 200 here is used to be the fastest speed forwards
         power = map(ps2x.Analog(PSS_LY),127, 0, 0 , 200);
-        Serial.print("FORWARD : ");
+        Serial.print("M1 FORWARD : ");
         Serial.println(power);
   
-        ST.motor(1, power);
-  
-      }
-      //  IF THE LEFT JOYSTICK BEING PUSHED DOWN, MOVE M1 BACKWARDS
-      else if (ps2x.Analog(PSS_LY) >= 128 && ps2x.Analog(PSS_LY) <= 255)
-      { 
+        ST.motor(1, power);  
+}
+
+//  IF THE LEFT JOYSTICK BEING PUSHED DOWN, MOVE M1 BACKWARDS
+void leftStickSouth(){
         // Map the incoming analog value from the joystick to the serial command given to the sabertooth
         // Negative 200 here is used to be the fastest speed backwards
         power = map(ps2x.Analog(PSS_LY),128, 255, 0, -200);
-        Serial.print("BACKWARD :");
+        Serial.print("M1 BACKWARD :");
         Serial.println(power);
         
-        ST.motor(1, power);
-      }
-      else 
-      {
+        ST.motor(1, power);    
+}
+
+// KILL MOTORS
+void killRightMotor(){
+        ST.motor(2, 0);
+}
+
+void killLeftMotor(){
         ST.motor(1, 0);
-      }
-    }
-    
-  delay(50);
 }
