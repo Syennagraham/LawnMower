@@ -54,9 +54,8 @@ More to come.
     PS2 controller
       - Sends signal of which direction via analog to the Ardiuno. 
 
-![Iteration1](https://github.com/Syennagraham/LawnMower/blob/master/pic1.jpg)
-![Iteration1](https://github.com/Syennagraham/LawnMower/blob/master/pic2.jpg)
-
+<a href="url"><img src="https://github.com/Syennagraham/LawnMower/blob/master/pic1.jpg"  height="500" width="500" ></a>
+<a href="url"><img src="https://github.com/Syennagraham/LawnMower/blob/master/pic2.jpg"  height="500" width="500" ></a>
 
 ##### Sources
 https://surtrtech.com/2018/11/29/interfacing-wireless-ps2-controller-with-arduino/
