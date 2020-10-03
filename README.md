@@ -6,7 +6,7 @@ Notes:
  - Blades are set to high to cut grass
  - Tires need to be switched out to handle terrian
  
-![Iteration One Video](https://youtu.be/TQeyf4UTyNA)
+[Iteration One Video Link](https://youtu.be/TQeyf4UTyNA)
 
 
 ## Electronics 
