@@ -1,6 +1,13 @@
 # RC Lawn Mower 
 Instructions to create a PS2/Microcontroller controlled lawn mower.
 
+## Video of Iteration 
+Notes:
+ - Blades are set to high to cut grass
+ - Tires need to be switched out to handle terrian
+ 
+![[Iteration One Video](https://img.youtube.com/vi/TQeyf4UTyNA/maxresdefault.jpg)](https://youtu.be/TQeyf4UTyNA)
+
 
 ## Electronics 
 ### 1.  Connect PS2 to Arduino
