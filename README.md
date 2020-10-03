@@ -53,7 +53,9 @@ More to come.
       - Used to hold wood board to REEL mower frame
     PS2 controller
       - Sends signal of which direction via analog to the Ardiuno. 
-  
+
+![Iteration1](https://github.com/Syennagraham/LawnMower/blob/master/pic1.jpg)
+![Iteration1](https://github.com/Syennagraham/LawnMower/blob/master/pic2.jpg)
 
 
 ##### Sources
